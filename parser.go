@@ -9,9 +9,9 @@ import (
 	"strings"
 )
 
-func parse(db *sql.DB) {
+func startParse(db *sql.DB) {
 	parseRoute(db)
-	parseStopTime(db)
+	//	parseStopTime(db)
 }
 
 func parseRoute(db *sql.DB) {

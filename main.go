@@ -5,8 +5,13 @@ import (
 )
 
 func main() {
-	log.Println("1. Database")
+
+	log.Println("--- Database ---")
 	db := startDb()
-	log.Println("2. Parse")
-	parse(db)
+
+	log.Println("--- Parse ---")
+	startParse(db)
+
+	log.Println("--- Server ---")
+	startServer(db)
 }

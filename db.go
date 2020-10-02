@@ -9,7 +9,7 @@ import (
 
 func startDb() *sql.DB {
 	os.Remove("data/gtfs.db")
-	log.Println("Remove then Creating ./data/gtfs.db")
+	log.Println(" => Remove then Creating ./data/gtfs.db")
 	file, err := os.Create("data/gtfs.db")
 	if err != nil {
 		log.Fatal(err.Error())
@@ -18,7 +18,6 @@ func startDb() *sql.DB {
 	log.Println("./data/gtfs.db created")
 
 	sqliteDatabase, _ := sql.Open("sqlite3", "./data/gtfs.db")
-	// defer sqliteDatabase.Close()
 
 	createTableRoute(sqliteDatabase)
 	createTableStopTime(sqliteDatabase)
@@ -32,7 +31,7 @@ func createTableRoute(db *sql.DB) {
 		COLUMN_ROUTE_SHORT_NAME TEXT
 	  );`
 
-	log.Println("creating TABLE_ROUTE...")
+	log.Println(" => Creating TABLE_ROUTE...")
 	statement, err := db.Prepare(createTable)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -52,7 +51,7 @@ func createTableStopTime(db *sql.DB) {
                 COLUMN_STOP_HEADSIGN TEXT
 	);`
 
-	log.Println("Creating TABLE_STOP_TIME...")
+	log.Println(" => Creating TABLE_STOP_TIME...")
 	statement, err := db.Prepare(createTable)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -62,7 +61,6 @@ func createTableStopTime(db *sql.DB) {
 }
 
 func insertRoute(db *sql.DB, routeId string, routeShortName string) {
-	//	log.Println("Inserting route...")
 	insertSQL := `INSERT INTO TABLE_ROUTE(COLUMN_ROUTE_ID, COLUMN_ROUTE_SHORT_NAME) VALUES (?, ?)`
 	statement, err := db.Prepare(insertSQL)
 	if err != nil {
@@ -75,7 +73,6 @@ func insertRoute(db *sql.DB, routeId string, routeShortName string) {
 }
 
 func insertStopTime(db *sql.DB, tripId string, routeId string, arrivalTime string, departureTime string, stopId string, stopHeadsign string) {
-	// log.Println("Inserting registry...")
 	insertSQL := `INSERT INTO TABLE_STOP_TIME(COLUMN_TRIP_ID, COLUMN_ROUTE_ID, COLUMN_ARRIVAL_TIME, COLUMN_DEPARTURE_TIME, COLUMN_STOP_ID, COLUMN_STOP_HEADSIGN) VALUES (?, ?, ?, ?, ?, ?)`
 	statement, err := db.Prepare(insertSQL)
 	if err != nil {
