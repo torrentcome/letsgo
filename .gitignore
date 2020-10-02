@@ -1,0 +1,10 @@
+
+*.dll
+*.so
+*.dylib
+
+*.text
+*.out
+
+data/routes.txt
+data/stop_times.txt
