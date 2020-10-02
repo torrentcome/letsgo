@@ -6,5 +6,7 @@
 *.text
 *.out
 
+data/
+data/gtfs.db
 data/routes.txt
 data/stop_times.txt
