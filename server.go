@@ -10,10 +10,10 @@ func startServer(db *sql.DB) {
 	router := gin.Default()
 
 	router.GET("/stop_id/:stop_id", func(c *gin.Context) {
-		stopId := c.Param("stop_id")
+		stopID := c.Param("stop_id")
 		c.JSON(200, gin.H{
 			"code":    "PAGE_FOUND",
-			"message": "data " + stopId})
+			"message": "data " + stopID})
 
 	})
 

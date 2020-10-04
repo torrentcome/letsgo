@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
-	"sync"
+	// "sync"
 )
 
 func startParse(db *sql.DB) {
@@ -49,21 +49,21 @@ func parseStopTime(db *sql.DB) {
 	bar := pb.Simple.Start(count)
 	scanner := bufio.NewScanner(file)
 
-	phraseC := make(chan string)
-	wg := sync.WaitGroup{}
+	// phraseC := make(chan string)
+	// wg := sync.WaitGroup{}
 
 	for scanner.Scan() {
 		phrase := scanner.Text()
 		lineSplit := strings.Split(phrase, ",")
 
-		tripId := lineSplit[0]
-		parseTripId := strings.Split(tripId, ".")
-		routeId := ""
-		if len(parseTripId) > 2 {
-			routeId = parseTripId[2]
+		tripID := lineSplit[0]
+		parseTripID := strings.Split(tripID, ".")
+		routeID := ""
+		if len(parseTripID) > 2 {
+			routeID = parseTripID[2]
 		}
 
-		insertStopTime(db, lineSplit[0], routeId, lineSplit[1], lineSplit[2], lineSplit[3], lineSplit[5])
+		insertStopTime(db, lineSplit[0], routeID, lineSplit[1], lineSplit[2], lineSplit[3], lineSplit[5])
 		bar.Increment()
 	}
 	if err := scanner.Err(); err != nil {

@@ -60,25 +60,25 @@ _ID INTEGER PRIMARY KEY,
 	log.Println("TABLE_STOP_TIME created")
 }
 
-func insertRoute(db *sql.DB, routeId string, routeShortName string) {
+func insertRoute(db *sql.DB, routeID string, routeShortName string) {
 	insertSQL := `INSERT INTO TABLE_ROUTE(COLUMN_ROUTE_ID, COLUMN_ROUTE_SHORT_NAME) VALUES (?, ?)`
 	statement, err := db.Prepare(insertSQL)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(&routeId, &routeShortName)
+	_, err = statement.Exec(&routeID, &routeShortName)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 }
 
-func insertStopTime(db *sql.DB, tripId string, routeId string, arrivalTime string, departureTime string, stopId string, stopHeadsign string) {
+func insertStopTime(db *sql.DB, tripID string, routeID string, arrivalTime string, departureTime string, stopID string, stopHeadsign string) {
 	insertSQL := `INSERT INTO TABLE_STOP_TIME(COLUMN_TRIP_ID, COLUMN_ROUTE_ID, COLUMN_ARRIVAL_TIME, COLUMN_DEPARTURE_TIME, COLUMN_STOP_ID, COLUMN_STOP_HEADSIGN) VALUES (?, ?, ?, ?, ?, ?)`
 	statement, err := db.Prepare(insertSQL)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(tripId, routeId, arrivalTime, departureTime, stopId, stopHeadsign)
+	_, err = statement.Exec(tripID, routeID, arrivalTime, departureTime, stopID, stopHeadsign)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
