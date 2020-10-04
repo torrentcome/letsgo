@@ -14,7 +14,7 @@ func startDb() *sql.DB {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	file.Close()
+	defer file.Close()
 	log.Println("./data/gtfs.db created")
 
 	sqliteDatabase, _ := sql.Open("sqlite3", "./data/gtfs.db")

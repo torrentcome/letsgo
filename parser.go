@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
-	// "sync"
+	"sync"
 )
 
 func startParse(db *sql.DB) {
@@ -49,23 +49,66 @@ func parseStopTime(db *sql.DB) {
 	bar := pb.Simple.Start(count)
 	scanner := bufio.NewScanner(file)
 
-	// phraseC := make(chan string)
-	// wg := sync.WaitGroup{}
+	type entry struct {
+		tripID        string
+		routeID       string
+		arrivalTime   string
+		departureTime string
+		stopID        string
+		stopHeadsign  string
+		wg            *sync.WaitGroup
+	}
+	entries := make(chan entry)
+	wg := sync.WaitGroup{}
+
+	go func() {
+		for {
+			select {
+			case entry, ok := <-entries:
+				if ok {
+					insertStopTime(db, entry.tripID, entry.routeID, entry.arrivalTime, entry.departureTime, entry.stopID, entry.stopHeadsign)
+					bar.Increment()
+					entry.wg.Done()
+				}
+			}
+		}
+	}()
+
+	linesChunkLen := 64 * 1024
+	lines := make([]string, 0, 0)
 
 	for scanner.Scan() {
 		phrase := scanner.Text()
-		lineSplit := strings.Split(phrase, ",")
+		lines = append(lines, phrase)
 
-		tripID := lineSplit[0]
-		parseTripID := strings.Split(tripID, ".")
-		routeID := ""
-		if len(parseTripID) > 2 {
-			routeID = parseTripID[2]
+		if len(lines) == linesChunkLen {
+			wg.Add(len(lines))
+			process := lines
+			go func() {
+				for _, text := range process {
+					lineSplit := strings.Split(text, ",")
+					tripID := lineSplit[0]
+					parseTripID := strings.Split(tripID, ".")
+					routeID := ""
+					if len(parseTripID) > 2 {
+						routeID = parseTripID[2]
+					}
+
+					e := entry{wg: &wg}
+					e.tripID = tripID
+					e.routeID = routeID
+					e.arrivalTime = lineSplit[1]
+					e.departureTime = lineSplit[2]
+					e.stopID = lineSplit[3]
+					e.stopHeadsign = lineSplit[5]
+					entries <- e
+				}
+			}()
+			lines = make([]string, 0, linesChunkLen)
 		}
-
-		insertStopTime(db, lineSplit[0], routeID, lineSplit[1], lineSplit[2], lineSplit[3], lineSplit[5])
-		bar.Increment()
 	}
+	wg.Wait()
+	close(entries)
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
