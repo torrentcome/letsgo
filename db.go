@@ -26,7 +26,7 @@ func startDb() *sql.DB {
 
 func createTableRoute(db *sql.DB) {
 	createTable := `CREATE TABLE TABLE_ROUTE (
-		_ID INTEGER PRIMARY KEY,		
+_ID INTEGER PRIMARY KEY,		
 		COLUMN_ROUTE_ID TEXT,
 		COLUMN_ROUTE_SHORT_NAME TEXT
 	  );`
@@ -42,13 +42,13 @@ func createTableRoute(db *sql.DB) {
 
 func createTableStopTime(db *sql.DB) {
 	createTable := `CREATE TABLE TABLE_STOP_TIME (
-		_ID INTEGER PRIMARY KEY,		
+_ID INTEGER PRIMARY KEY,		
 		COLUMN_TRIP_ID TEXT,
-                COLUMN_ROUTE_ID TEXT,
-                COLUMN_ARRIVAL_TIME TEXT,
-                COLUMN_DEPARTURE_TIME TEXT,
-                COLUMN_STOP_ID TEXT,
-                COLUMN_STOP_HEADSIGN TEXT
+		COLUMN_ROUTE_ID TEXT,
+		COLUMN_ARRIVAL_TIME TEXT,
+		COLUMN_DEPARTURE_TIME TEXT,
+		COLUMN_STOP_ID TEXT,
+		COLUMN_STOP_HEADSIGN TEXT
 	);`
 
 	log.Println(" => Creating TABLE_STOP_TIME...")

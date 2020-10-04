@@ -7,11 +7,12 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 )
 
 func startParse(db *sql.DB) {
 	parseRoute(db)
-	//	parseStopTime(db)
+	parseStopTime(db)
 }
 
 func parseRoute(db *sql.DB) {
@@ -28,11 +29,7 @@ func parseRoute(db *sql.DB) {
 	for scanner.Scan() {
 		phrase := scanner.Text()
 		phraseSplit := strings.Split(phrase, ",")
-
-		routeId := phraseSplit[0]
-		routeShortName := phraseSplit[2]
-
-		insertRoute(db, routeId, routeShortName)
+		insertRoute(db, phraseSplit[0], phraseSplit[2])
 		bar.Increment()
 	}
 	if err := scanner.Err(); err != nil {
@@ -44,14 +41,17 @@ func parseRoute(db *sql.DB) {
 func parseStopTime(db *sql.DB) {
 	file, err := os.Open("./data/stop_times.txt")
 	count, _ := lineCount("./data/stop_times.txt")
-
-	bar := pb.Simple.Start(count)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
+
+	bar := pb.Simple.Start(count)
 	scanner := bufio.NewScanner(file)
+
+	phraseC := make(chan string)
+	wg := sync.WaitGroup{}
+
 	for scanner.Scan() {
 		phrase := scanner.Text()
 		lineSplit := strings.Split(phrase, ",")
@@ -63,12 +63,7 @@ func parseStopTime(db *sql.DB) {
 			routeId = parseTripId[2]
 		}
 
-		arrivalTime := lineSplit[1]
-		departureTime := lineSplit[2]
-		stopId := lineSplit[3]
-		stopHeadsign := lineSplit[5]
-
-		insertStopTime(db, tripId, routeId, arrivalTime, departureTime, stopId, stopHeadsign)
+		insertStopTime(db, lineSplit[0], routeId, lineSplit[1], lineSplit[2], lineSplit[3], lineSplit[5])
 		bar.Increment()
 	}
 	if err := scanner.Err(); err != nil {

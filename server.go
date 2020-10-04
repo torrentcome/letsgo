@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	//"net/http"
 )
 
 func startServer(db *sql.DB) {
@@ -11,11 +11,15 @@ func startServer(db *sql.DB) {
 
 	router.GET("/stop_id/:stop_id", func(c *gin.Context) {
 		stopId := c.Param("stop_id")
-		c.String(http.StatusOK, "Hello, next stop id is %s", stopId)
+		c.JSON(200, gin.H{
+			"code":    "PAGE_FOUND",
+			"message": "data " + stopId})
+
 	})
 
 	router.NoRoute(func(c *gin.Context) {
-		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND",
+		c.JSON(404, gin.H{
+			"code":    "PAGE_NOT_FOUND",
 			"message": "Page not found"})
 	})
 

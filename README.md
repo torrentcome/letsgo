@@ -1,7 +1,7 @@
 # Lets Go
 
 A sample who will deal with GTFS file
-- Working on vim plugin
+- Working on vim 
 - Plugin vim-go  https://github.com/fatih/vim-go
 
 ## Implementation
