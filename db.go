@@ -19,13 +19,23 @@ func startDb() *sql.DB {
 
 	sqliteDatabase, _ := sql.Open("sqlite3", "./data/gtfs.db")
 
+	configure(sqliteDatabase)
 	createTableRoute(sqliteDatabase)
 	createTableStopTime(sqliteDatabase)
 	return sqliteDatabase
 }
 
+func configure(db *sql.DB) {
+	ddl := `
+PPRAGMA synchronous = OFF;
+	PRAGMA journal_mode = MEMORY;`
+	db.Exec(ddl)
+	log.Println(" => configure DB")
+}
+
 func createTableRoute(db *sql.DB) {
-	createTable := `CREATE TABLE TABLE_ROUTE (
+	createTable := `
+CREATE TABLE TABLE_ROUTE (
 _ID INTEGER PRIMARY KEY,		
 		COLUMN_ROUTE_ID TEXT,
 		COLUMN_ROUTE_SHORT_NAME TEXT
@@ -41,7 +51,8 @@ _ID INTEGER PRIMARY KEY,
 }
 
 func createTableStopTime(db *sql.DB) {
-	createTable := `CREATE TABLE TABLE_STOP_TIME (
+	createTable := `
+CREATE TABLE TABLE_STOP_TIME (
 _ID INTEGER PRIMARY KEY,		
 		COLUMN_TRIP_ID TEXT,
 		COLUMN_ROUTE_ID TEXT,
@@ -78,7 +89,7 @@ func insertStopTime(db *sql.DB, tripID string, routeID string, arrivalTime strin
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(tripID, routeID, arrivalTime, departureTime, stopID, stopHeadsign)
+	_, err = statement.Exec(&tripID, &routeID, &arrivalTime, &departureTime, &stopID, &stopHeadsign)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
