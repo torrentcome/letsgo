@@ -27,8 +27,20 @@ func startDb() *sql.DB {
 
 func configure(db *sql.DB) {
 	ddl := `
-PPRAGMA synchronous = OFF;
-	PRAGMA journal_mode = MEMORY;`
+PRAGMA automatic_index = ON;
+	PRAGMA cache_size = 32768;
+	PRAGMA cache_spill = OFF;
+	PRAGMA foreign_keys = ON;
+	PRAGMA journal_size_limit = 67110000;
+	PRAGMA locking_mode = NORMAL;
+	PRAGMA page_size = 4096;
+	PRAGMA recursive_triggers = ON;
+	PRAGMA secure_delete = ON;
+	PRAGMA synchronous = NORMAL;
+	PRAGMA temp_store = MEMORY;
+	PRAGMA journal_mode = WAL;
+	PRAGMA wal_autocheckpoint = 16384;
+	`
 	db.Exec(ddl)
 	log.Println(" => configure DB")
 }

@@ -63,12 +63,42 @@ func parseStopTime(db *sql.DB) {
 	entries := make(chan entry)
 	wg := sync.WaitGroup{}
 
+	insertSQL := `INSERT INTO TABLE_STOP_TIME(COLUMN_TRIP_ID, COLUMN_ROUTE_ID, COLUMN_ARRIVAL_TIME, COLUMN_DEPARTURE_TIME, COLUMN_STOP_ID, COLUMN_STOP_HEADSIGN) VALUES (?, ?, ?, ?, ?, ?)`
+	statement, err := db.Prepare(insertSQL)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	defer statement.Close()
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	countEntry := 0
+
 	go func() {
 		for {
 			select {
 			case entry, ok := <-entries:
 				if ok {
 					// insertStopTime(db, entry.tripID, entry.routeID, entry.arrivalTime, entry.departureTime, entry.stopID, entry.stopHeadsign)
+					_, err := tx.Stmt(statement).Exec(entry.tripID, entry.routeID, entry.arrivalTime, entry.departureTime, entry.stopID, entry.stopHeadsign)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					if countEntry%32768 == 0 {
+						tx.Commit()
+						db.Exec(`PRAGMA shrink_memory;`)
+
+						tx, err = db.Begin()
+						if err != nil {
+							log.Fatal(err)
+						}
+					}
+
+					countEntry++
 					bar.Increment()
 					entry.wg.Done()
 				}
@@ -110,7 +140,9 @@ func parseStopTime(db *sql.DB) {
 		}
 	}
 	wg.Wait()
+	tx.Commit()
 	close(entries)
+
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
