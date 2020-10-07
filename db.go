@@ -42,7 +42,7 @@ PRAGMA automatic_index = ON;
 	PRAGMA wal_autocheckpoint = 16384;
 	`
 	db.Exec(ddl)
-	log.Println(" => configure DB")
+	log.Println(" => Configure DB")
 }
 
 func createTableRoute(db *sql.DB) {
