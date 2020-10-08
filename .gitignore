@@ -7,9 +7,9 @@
 *.out
 
 # except
-!*/data/README.md
+!/data/README.md
 
-data/
+data/*
 data/gtfs.db
 data/routes.txt
 data/stop_times.txt
