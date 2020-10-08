@@ -6,6 +6,9 @@
 *.text
 *.out
 
+# except
+!*/data/README.md
+
 data/
 data/gtfs.db
 data/routes.txt
