@@ -1,4 +1,7 @@
 # Lets Go
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/torrentcome/letsgo)](https://goreportcard.com/report/github.com/torrentcome/letsgo)
+
 A sample who will deal with GTFS file
 - Working on vim 
 - Plugin vim-go https://github.com/fatih/vim-go
