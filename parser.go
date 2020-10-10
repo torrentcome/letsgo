@@ -13,6 +13,7 @@ import (
 func startParse(db *sql.DB) {
 	log.Println("Parsing --- routes file ...")
 	parseRoute(db)
+	updateRoute(db)
 	log.Println("Parsing --- stop_time file ...")
 	parseStopTime(db)
 }
@@ -38,6 +39,14 @@ func parseRoute(db *sql.DB) {
 		log.Fatal(err)
 	}
 	bar.Finish()
+}
+
+func updateRoute(db *sql.DB) {
+	smt, err := db.Prepare(`UPDATE TABLE_ROUTE SET COLUMN_ROUTE_ID = REPLACE(COLUMN_ROUTE_ID,'"','');`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	smt.Exec()
 }
 
 func parseStopTime(db *sql.DB) {
@@ -82,7 +91,6 @@ func parseStopTime(db *sql.DB) {
 			select {
 			case entry, ok := <-entries:
 				if ok {
-					// insertStopTime(db, entry.tripID, entry.routeID, entry.arrivalTime, entry.departureTime, entry.stopID, entry.stopHeadsign)
 					_, err := tx.Stmt(statement).Exec(entry.tripID, entry.routeID, entry.arrivalTime, entry.departureTime, entry.stopID, entry.stopHeadsign)
 					if err != nil {
 						log.Fatal(err)
