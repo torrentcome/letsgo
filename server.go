@@ -41,7 +41,7 @@ func startServer(db *sql.DB) {
 		}
 		defer rows.Close()
 		if len(array) <= 0 {
-			c.JSON(http.StatusNoContent, gin.H{"code": http.StatusNoContent, "message": "No content for this stop_id"})
+			c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "No content for stop_id = " + stopID})
 		} else {
 			c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": array, "count": len(array)})
 		}

@@ -32,7 +32,7 @@ func parseRoute(db *sql.DB) {
 	for scanner.Scan() {
 		phrase := scanner.Text()
 		phraseSplit := strings.Split(phrase, ",")
-		insertRoute(db, phraseSplit[0], phraseSplit[2])
+		insertRoute(db, trimQuotes(phraseSplit[0]), trimQuotes(phraseSplit[2]))
 		bar.Increment()
 	}
 	if err := scanner.Err(); err != nil {
@@ -135,12 +135,12 @@ func parseStopTime(db *sql.DB) {
 					}
 
 					e := entry{wg: &wg}
-					e.tripID = tripID
-					e.routeID = routeID
-					e.arrivalTime = lineSplit[1]
-					e.departureTime = lineSplit[2]
-					e.stopID = lineSplit[3]
-					e.stopHeadsign = lineSplit[5]
+					e.tripID = trimQuotes(tripID)
+					e.routeID = trimQuotes(routeID)
+					e.arrivalTime = trimQuotes(lineSplit[1])
+					e.departureTime = trimQuotes(lineSplit[2])
+					e.stopID = trimQuotes(lineSplit[3])
+					e.stopHeadsign = trimQuotes(lineSplit[5])
 					entries <- e
 				}
 			}()
