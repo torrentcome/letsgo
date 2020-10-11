@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -11,7 +12,8 @@ func startServer(db *sql.DB) {
 
 	router.GET("/stop_id/:stop_id", func(c *gin.Context) {
 		stopID := c.Param("stop_id")
-		rows, err := db.Query("SELECT * FROM TABLE_STOP_TIME INNER JOIN TABLE_ROUTE ON TABLE_ROUTE.COLUMN_ROUTE_ID = TABLE_STOP_TIME.COLUMN_ROUTE_ID WHERE COLUMN_STOP_ID=?", stopID)
+		fmt.Println("stop_id =" + stopID)
+		rows, err := db.Query(`SELECT * FROM TABLE_STOP_TIME INNER JOIN TABLE_ROUTE ON TABLE_ROUTE.COLUMN_ROUTE_ID = TABLE_STOP_TIME.COLUMN_ROUTE_ID WHERE COLUMN_STOP_ID='?'`, stopID)
 		return500(c, err)
 
 		type entry struct {
@@ -23,6 +25,8 @@ func startServer(db *sql.DB) {
 			stopHeadsign   string
 			routeShortName string
 		}
+
+		fmt.Println(rows)
 
 		var array []entry
 
@@ -37,7 +41,9 @@ func startServer(db *sql.DB) {
 		if rows.Next() {
 			err = rows.Scan(&tripID, &routeID, &departureTime, &arrivalTime, &dbStopID, &stopHeadsign, &routeShortName)
 			return500(c, err)
+			fmt.Println(&tripID)
 			array = append(array, entry{tripID, routeID, departureTime, arrivalTime, dbStopID, stopHeadsign, routeShortName})
+			fmt.Println(array)
 		}
 		defer rows.Close()
 		if len(array) <= 0 {
