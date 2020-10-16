@@ -10,6 +10,9 @@ data/*
 data/gtfs.db
 data/routes.txt
 data/stop_times.txt
+.server.go.swp
+gtfs
+
 
 # except
 !/data/README.md
