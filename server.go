@@ -32,7 +32,7 @@ func startServer(db *sql.DB) {
 
 		var array []entry
 
-		if rows.Next() {
+		for rows.Next() {
 			e := entry{}
 			err = rows.Scan(&e.tripID, &e.routeID, &e.departureTime, &e.arrivalTime, &e.stopID, &e.stopHeadsign, &e.routeShortName)
 			fmt.Println(e)
