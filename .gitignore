@@ -12,7 +12,8 @@ data/routes.txt
 data/stop_times.txt
 .server.go.swp
 gtfs
-
+data/.gtfs.db-shm
+data/.gtfs.db-wal
 
 # except
 !/data/README.md
