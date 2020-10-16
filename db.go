@@ -8,9 +8,14 @@ import (
 )
 
 func startDb() *sql.DB {
+
+	log.Println(" => Remove ./data/gtfs.db")
 	os.Remove("data/gtfs.db")
-	log.Println(" => Remove then Creating ./data/gtfs.db")
+	os.Remove("data/gtfs.db-shm")
+	os.Remove("data/gtfs.db-wal")
+
 	file, err := os.Create("data/gtfs.db")
+	log.Println(" => Creating ./data/gtfs.db")
 	if err != nil {
 		log.Fatal(err.Error())
 	}

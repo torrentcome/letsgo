@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	_ "github.com/mattn/go-sqlite3"
 	"net/http"
 )
 
@@ -13,9 +14,10 @@ func startServer(db *sql.DB) {
 	router.GET("/stop_id/:stop_id", func(c *gin.Context) {
 		stopID := c.Param("stop_id")
 		fmt.Println("stop_id =" + stopID)
-		rows, err := db.Query(`SELECT * FROM TABLE_STOP_TIME INNER JOIN TABLE_ROUTE ON TABLE_ROUTE.COLUMN_ROUTE_ID = TABLE_STOP_TIME.COLUMN_ROUTE_ID WHERE COLUMN_STOP_ID='?'`, stopID)
-		return500(c, err)
-
+		rows, err := db.Query(`SELECT COLUMN_TRIP_ID, TABLE_ROUTE.COLUMN_ROUTE_ID, COLUMN_ARRIVAL_TIME, COLUMN_DEPARTURE_TIME, COLUMN_STOP_ID, COLUMN_STOP_HEADSIGN, COLUMN_ROUTE_SHORT_NAME FROM TABLE_STOP_TIME INNER JOIN TABLE_ROUTE ON TABLE_ROUTE.COLUMN_ROUTE_ID = TABLE_STOP_TIME.COLUMN_ROUTE_ID WHERE COLUMN_STOP_ID=?`, stopID)
+		if err != nil {
+			return500(c, err)
+		}
 		type entry struct {
 			tripID         string
 			routeID        string
@@ -30,26 +32,19 @@ func startServer(db *sql.DB) {
 
 		var array []entry
 
-		var tripID string
-		var routeID string
-		var arrivalTime string
-		var departureTime string
-		var dbStopID string
-		var stopHeadsign string
-		var routeShortName string
-
 		if rows.Next() {
-			err = rows.Scan(&tripID, &routeID, &departureTime, &arrivalTime, &dbStopID, &stopHeadsign, &routeShortName)
+			e := entry{}
+			err = rows.Scan(&e.tripID, &e.routeID, &e.departureTime, &e.arrivalTime, &e.stopID, &e.stopHeadsign, &e.routeShortName)
+			fmt.Println(e)
 			return500(c, err)
-			fmt.Println(&tripID)
-			array = append(array, entry{tripID, routeID, departureTime, arrivalTime, dbStopID, stopHeadsign, routeShortName})
+			array = append(array, e)
 			fmt.Println(array)
 		}
 		defer rows.Close()
 		if len(array) <= 0 {
 			c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "No content for stop_id = " + stopID})
 		} else {
-			c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": array, "count": len(array)})
+			c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": fmt.Sprint(array), "count": len(array)})
 		}
 	})
 
@@ -66,6 +61,6 @@ func return500(c *gin.Context, err error) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": "Internal Server Error"})
+			"message": "Internal Server Error = " + err.Error()})
 	}
 }
