@@ -11,6 +11,28 @@ import (
 func startServer(db *sql.DB) {
 	router := gin.Default()
 
+	router.GET("/stop_id", func(c *gin.Context) {
+		limit := c.DefaultQuery("limit", "100")
+		rows, err := db.Query(`SELECT COLUMN_STOP_ID, COLUMN_ROUTE_SHORT_NAME FROM TABLE_STOP_TIME INNER JOIN TABLE_ROUTE ON TABLE_ROUTE.COLUMN_ROUTE_ID = TABLE_STOP_TIME.COLUMN_ROUTE_ID LIMIT ?`, limit)
+		if err != nil {
+			return500(c, err)
+		}
+
+		type entry struct {
+			stopID         string
+			routeShortName string
+		}
+		var array []entry
+		for rows.Next() {
+			e := entry{}
+			err = rows.Scan(&e.stopID, &e.routeShortName)
+			return500(c, err)
+			array = append(array, e)
+		}
+		defer rows.Close()
+		c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": fmt.Sprint(array), "count": len(array)})
+	})
+
 	router.GET("/stop_id/:stop_id", func(c *gin.Context) {
 		stopID := c.Param("stop_id")
 		fmt.Println("stop_id =" + stopID)
@@ -28,21 +50,16 @@ func startServer(db *sql.DB) {
 			routeShortName string
 		}
 
-		fmt.Println(rows)
-
 		var array []entry
-
 		for rows.Next() {
 			e := entry{}
 			err = rows.Scan(&e.tripID, &e.routeID, &e.departureTime, &e.arrivalTime, &e.stopID, &e.stopHeadsign, &e.routeShortName)
-			fmt.Println(e)
 			return500(c, err)
 			array = append(array, e)
-			fmt.Println(array)
 		}
 		defer rows.Close()
 		if len(array) <= 0 {
-			c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": "No content for stop_id = " + stopID})
+			c.JSON(http.StatusNoContent, gin.H{"code": http.StatusNoContent, "message": "No content for stop_id = " + stopID})
 		} else {
 			c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "message": fmt.Sprint(array), "count": len(array)})
 		}
